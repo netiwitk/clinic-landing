@@ -1,0 +1,308 @@
+---
+import { Font, Picture, getImage } from 'astro:assets';
+import '../../styles/global.css';
+import { contact, credit, dict, doctors, langs, mapUrl, services, type Lang, type ServiceId } from '../../content';
+import hero from '../../assets/hero.jpg';
+import care from '../../assets/care.jpg';
+import lounge from '../../assets/lounge.jpg';
+import doctor1 from '../../assets/doctor-1.jpg';
+import doctor2 from '../../assets/doctor-2.jpg';
+import doctor3 from '../../assets/doctor-3.jpg';
+
+export const getStaticPaths = () => langs.map((lang) => ({ params: { lang } }));
+
+const lang = Astro.params.lang as Lang;
+const other: Lang = lang === 'th' ? 'en' : 'th';
+const t = dict[lang];
+const base = import.meta.env.BASE_URL;
+const pageUrl = (l: Lang) => new URL(`${base}${l}/`, Astro.site).href;
+const og = await getImage({ src: hero, width: 1200, height: 630, fit: 'cover', format: 'jpg' });
+const photos = { mint: doctor1, phum: doctor2, prae: doctor3 };
+const price = new Intl.NumberFormat(lang === 'th' ? 'th-TH' : 'en-US');
+
+// Stroke paths on a 24px grid; the tooth doubles as logo and favicon.
+const tooth = '<path d="M7 3c-2.2 0-4 1.8-4 4.2 0 2 .8 3.2 1.4 4.6.6 1.5.8 3.3 1.1 5.4.3 2.2 1 3.8 2.1 3.8 1.3 0 1.6-1.9 2-3.8.3-1.4.8-2.2 2.4-2.2s2.1.8 2.4 2.2c.4 1.9.7 3.8 2 3.8 1.1 0 1.8-1.6 2.1-3.8.3-2.1.5-3.9 1.1-5.4.6-1.4 1.4-2.6 1.4-4.6C21 4.8 19.2 3 17 3c-1.9 0-3 1-5 1S8.9 3 7 3Z"/>';
+const icons: Record<ServiceId, string> = {
+  scaling: '<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M5 3v4M3 5h4M19 17v4M17 19h4"/>',
+  filling: `${tooth}<circle cx="12" cy="9" r="1.6"/>`,
+  whitening: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  aligners: '<circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/>',
+  wisdom: '<path d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4"/><path d="M9 9h6v6H9z"/>',
+  implant: '<path d="M12 3v18M8 6h8M8 10h8M9 14h6M10 18h4"/>',
+};
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{t.meta.title}</title>
+    <meta name="description" content={t.meta.description} />
+    <meta name="theme-color" content="#faf7f2" />
+    <link rel="canonical" href={pageUrl(lang)} />
+    {langs.map((l) => <link rel="alternate" hreflang={l} href={pageUrl(l)} />)}
+    <link rel="alternate" hreflang="x-default" href={new URL(base, Astro.site).href} />
+    <link rel="icon" href={`data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#0e6e5c" stroke-width="2" stroke-linejoin="round">${tooth}</svg>`)}`} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={t.meta.title} />
+    <meta property="og:description" content={t.meta.description} />
+    <meta property="og:url" content={pageUrl(lang)} />
+    <meta property="og:image" content={new URL(og.src, Astro.site).href} />
+    <meta property="og:locale" content={t.meta.locale} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <Font cssVariable="--font-anuphan" preload={lang === 'th' ? true : [{ subset: 'latin' }]} />
+  </head>
+  <body>
+    <a class="skip" href="#main">{t.nav.skip}</a>
+
+    <header class="site-header">
+      <div class="container bar">
+        <a class="logo" href="#top">
+          <svg viewBox="0 0 24 24" aria-hidden="true" set:html={tooth} />
+          <span>Mellow <b>Dental</b></span>
+        </a>
+        <nav aria-label={t.nav.services}>
+          <a href="#services">{t.nav.services}</a>
+          <a href="#visit">{t.nav.visit}</a>
+          <a href="#doctors">{t.nav.doctors}</a>
+          <a href="#faq">{t.nav.faq}</a>
+          <a href="#contact">{t.nav.contact}</a>
+        </nav>
+        <a class="lang" href={`../${other}/`} hreflang={other} lang={other}>{t.nav.other}</a>
+        <a class="btn btn-sm" href="#book">{t.nav.book}</a>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="hero" id="top">
+        <div class="container hero-grid">
+          <div class="hero-copy">
+            <p class="pill">{t.hero.eyebrow}</p>
+            <h1>{t.hero.title}</h1>
+            <p class="lead">{t.hero.lead}</p>
+            <div class="cta">
+              <a class="btn" href="#book">{t.hero.book}</a>
+              <a class="btn btn-ghost" href="#services">{t.hero.prices}</a>
+            </div>
+            <ul class="facts">
+              {t.hero.facts.map((f) => <li>{f}</li>)}
+            </ul>
+          </div>
+          <figure class="hero-media">
+            <Picture
+              src={hero}
+              alt={t.hero.alt}
+              formats={['avif', 'webp']}
+              widths={[480, 720, 960, 1280]}
+              sizes="(min-width: 960px) 40vw, 100vw"
+              priority
+            />
+            <figcaption class="badge">{t.hero.badge}</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section id="services" class="section">
+        <div class="container">
+          <header class="section-head">
+            <p class="eyebrow">{t.services.eyebrow}</p>
+            <h2>{t.services.title}</h2>
+            <p class="lead">{t.services.lead}</p>
+          </header>
+          <div class="bento">
+            <figure class="tile tile-photo reveal">
+              <Picture src={care} alt={t.services.careAlt} formats={['avif', 'webp']} widths={[480, 720, 960]} sizes="(min-width: 960px) 33vw, 100vw" />
+              <figcaption>{t.services.care}</figcaption>
+            </figure>
+            {(Object.keys(services) as ServiceId[]).map((id) => (
+              <article class="tile reveal">
+                <span class="icon">
+                  <svg viewBox="0 0 24 24" aria-hidden="true" set:html={icons[id]} />
+                </span>
+                <h3>{t.services.items[id].name}</h3>
+                <p>{t.services.items[id].desc}</p>
+                <p class="price">
+                  {t.services.from} <strong>{price.format(services[id])}</strong> {t.services.baht}
+                </p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="visit" class="section band">
+        <div class="container">
+          <header class="section-head">
+            <p class="eyebrow">{t.visit.eyebrow}</p>
+            <h2>{t.visit.title}</h2>
+          </header>
+          <ol class="steps">
+            {t.visit.steps.map((s) => (
+              <li class="reveal">
+                <h3>{s.title}</h3>
+                <p>{s.desc}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      <section id="doctors" class="section">
+        <div class="container">
+          <header class="section-head">
+            <p class="eyebrow">{t.doctors.eyebrow}</p>
+            <h2>{t.doctors.title}</h2>
+          </header>
+          <ul class="doctors">
+            {doctors.map((id) => (
+              <li class="doctor reveal">
+                <Picture
+                  src={photos[id]}
+                  alt={`${t.doctors.alt} ${t.doctors.items[id].name}`}
+                  formats={['avif', 'webp']}
+                  widths={[240, 400, 640]}
+                  sizes="(min-width: 640px) 30vw, 7rem"
+                />
+                <div>
+                  <h3>{t.doctors.items[id].name}</h3>
+                  <p>{t.doctors.items[id].role}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <section id="book" class="section book">
+        <div class="container book-grid">
+          <header class="section-head">
+            <p class="eyebrow">{t.book.eyebrow}</p>
+            <h2>{t.book.title}</h2>
+            <p class="lead">{t.book.lead}</p>
+          </header>
+          <form class="card form" id="booking" data-title={t.book.message} data-line={contact.demo ? '' : contact.line}>
+            <label class="full">
+              {t.book.service}
+              <select name="service" required>
+                <option value="">{t.book.choose}</option>
+                {(Object.keys(services) as ServiceId[]).map((id) => <option>{t.services.items[id].name}</option>)}
+                <option>{t.book.unsure}</option>
+              </select>
+            </label>
+            <label>
+              {t.book.date}
+              <input type="date" name="date" required />
+            </label>
+            <label>
+              {t.book.time}
+              <select name="time" required>
+                <option value="">{t.book.chooseTime}</option>
+                {t.book.times.map((x) => <option>{x}</option>)}
+              </select>
+            </label>
+            <label>
+              {t.book.name}
+              <input name="name" autocomplete="name" required />
+            </label>
+            <label>
+              {t.book.phone}
+              <input type="tel" name="phone" autocomplete="tel" inputmode="tel" required />
+            </label>
+            <label class="full">
+              {t.book.note}
+              <textarea name="note" rows="2"></textarea>
+            </label>
+            <button class="btn full" type="submit">{t.book.submit}</button>
+          </form>
+        </div>
+        <dialog id="preview" aria-labelledby="preview-title">
+          <h3 id="preview-title">{t.book.previewTitle}</h3>
+          <p class="bubble" id="preview-text"></p>
+          <p class="note">{t.book.previewNote}</p>
+          <form method="dialog"><button class="btn full">{t.book.close}</button></form>
+        </dialog>
+      </section>
+
+      <section id="faq" class="section">
+        <div class="container narrow">
+          <header class="section-head">
+            <p class="eyebrow">{t.faq.eyebrow}</p>
+            <h2>{t.faq.title}</h2>
+          </header>
+          {t.faq.items.map((f) => (
+            <details class="faq">
+              <summary>{f.q}</summary>
+              <p>{f.a}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section id="contact" class="section">
+        <div class="container contact-grid">
+          <div>
+            <header class="section-head">
+              <p class="eyebrow">{t.contact.eyebrow}</p>
+              <h2>{t.contact.title}</h2>
+            </header>
+            <dl class="info">
+              <div><dt>{t.contact.hoursLabel}</dt><dd>{t.contact.hours}</dd></div>
+              <div><dt>{t.contact.whereLabel}</dt><dd>{t.contact.where}</dd></div>
+              <div><dt>{t.contact.lineLabel}</dt><dd>{contact.line}</dd></div>
+              <div><dt>{t.contact.phoneLabel}</dt><dd>{contact.phone}</dd></div>
+            </dl>
+            <a class="btn btn-ghost" href={mapUrl} target="_blank" rel="noopener">{t.contact.map}</a>
+          </div>
+          <Picture
+            class="contact-photo"
+            src={lounge}
+            alt={t.contact.alt}
+            formats={['avif', 'webp']}
+            widths={[480, 720, 960, 1280]}
+            sizes="(min-width: 960px) 50vw, 100vw"
+          />
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>© Mellow Dental · {t.footer.demo}</p>
+        <p>{t.footer.by} <a href={credit.url}>{credit.name}</a></p>
+      </div>
+    </footer>
+
+    <script>
+      const form = document.querySelector<HTMLFormElement>('#booking')!;
+      const dialog = document.querySelector<HTMLDialogElement>('#preview')!;
+      const date = form.elements.namedItem('date') as HTMLInputElement;
+      date.min = new Date().toLocaleDateString('sv');
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const lang = document.documentElement.lang;
+        const day = new Intl.DateTimeFormat(lang === 'th' ? 'th-TH' : 'en-GB', {
+          weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC',
+        });
+        const lines = [form.dataset.title];
+        for (const el of form.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('[name]')) {
+          if (!el.value.trim()) continue;
+          const label = el.closest('label')!.firstChild!.textContent!.trim();
+          const value =
+            el instanceof HTMLSelectElement ? el.selectedOptions[0].text
+            : el.type === 'date' ? day.format((el as HTMLInputElement).valueAsDate!)
+            : el.value.trim();
+          lines.push(`${label}: ${value}`);
+        }
+        const text = lines.join('\n');
+        if (form.dataset.line) {
+          location.href = `https://line.me/R/oaMessage/${form.dataset.line}/?${encodeURIComponent(text)}`;
+          return;
+        }
+        document.querySelector('#preview-text')!.textContent = text;
+        dialog.showModal();
+      });
+    </script>
+  </body>
+</html>

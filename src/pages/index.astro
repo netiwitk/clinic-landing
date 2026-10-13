@@ -1,0 +1,19 @@
+---
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mellow Dental (demo)</title>
+    <meta name="description" content="Mellow Dental, a demo dental clinic website in Thai and English." />
+    <!-- Thai devices get the Thai page, everyone else English. Relative paths keep working under any base path. -->
+    <script is:inline>
+      location.replace(navigator.languages.some((l) => /^th\b/i.test(l)) ? 'th/' : 'en/');
+    </script>
+  </head>
+  <body>
+    <p><a href="th/" hreflang="th" lang="th">ภาษาไทย</a> · <a href="en/" hreflang="en">English</a></p>
+  </body>
+</html>
