@@ -16,7 +16,8 @@ const other: Lang = lang === 'th' ? 'en' : 'th';
 const t = dict[lang];
 const base = import.meta.env.BASE_URL;
 const pageUrl = (l: Lang) => new URL(`${base}${l}/`, Astro.site).href;
-const og = await getImage({ src: hero, width: 1200, height: 630, fit: 'cover', format: 'jpg' });
+// Link previews (LINE, Facebook) are landscape, so crop from the landscape photo, not the tall hero.
+const og = await getImage({ src: lounge, width: 1200, height: 630, fit: 'cover', format: 'jpg' });
 const photos = { mint: doctor1, phum: doctor2, prae: doctor3 };
 const price = new Intl.NumberFormat(lang === 'th' ? 'th-TH' : 'en-US');
 
@@ -62,7 +63,7 @@ const icons: Record<ServiceId, string> = {
           <svg viewBox="0 0 24 24" aria-hidden="true" set:html={tooth} />
           <span>Mellow <b>Dental</b></span>
         </a>
-        <nav aria-label={t.nav.services}>
+        <nav>
           <a href="#services">{t.nav.services}</a>
           <a href="#visit">{t.nav.visit}</a>
           <a href="#doctors">{t.nav.doctors}</a>

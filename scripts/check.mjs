@@ -76,19 +76,20 @@ const expected = {
   th: ['ขอจองคิว Mellow Dental', 'บริการ: ฟอกสีฟัน', `วันที่: `, ` ${date} `, ` ${year + 543}`, 'ช่วงเวลา: บ่าย 13:00–17:00', 'ชื่อ: สมใจ', 'เบอร์โทร: 0812345678'],
   en: ['Booking request, Mellow Dental', 'Service: Whitening', 'Date: ', ` ${date} `, ` ${year}`, 'Time: Afternoon 13:00–17:00', 'Name: Somjai', 'Phone: 0812345678'],
 };
+const book = (lang) => evaluate(`(() => {
+  const f = document.querySelector('#booking');
+  f.service.selectedIndex = 3;
+  f.date.value = '${iso}';
+  f.time.selectedIndex = 2;
+  f.name.value = '${lang === 'th' ? 'สมใจ' : 'Somjai'}';
+  f.phone.value = '0812345678';
+  f.requestSubmit();
+  return document.querySelector('#preview').open && document.querySelector('#preview-text').textContent;
+})()`);
 for (const lang of ['th', 'en']) {
   await go(page(lang));
   await settle();
-  const text = await evaluate(`(() => {
-    const f = document.querySelector('#booking');
-    f.service.selectedIndex = 3;
-    f.date.value = '${iso}';
-    f.time.selectedIndex = 2;
-    f.name.value = '${lang === 'th' ? 'สมใจ' : 'Somjai'}';
-    f.phone.value = '0812345678';
-    f.requestSubmit();
-    return document.querySelector('#preview').open && document.querySelector('#preview-text').textContent;
-  })()`);
+  const text = await book(lang);
   check(typeof text === 'string' && expected[lang].every((s) => text.includes(s)), `${lang} booking preview: ${JSON.stringify(text)}`);
   const empty = await evaluate(`(() => { document.querySelector('#preview').close(); const f = document.querySelector('#booking'); f.reset(); f.requestSubmit(); return document.querySelector('#preview').open; })()`);
   check(empty === false, `${lang} empty form does not submit`);
@@ -108,6 +109,17 @@ for (const [name, width, height, mobile] of [['390', 390, 844, true], ['1366', 1
       const { result } = await send('Page.captureScreenshot', { format: 'jpeg', quality: 80, captureBeyondViewport: true, clip: { x: 0, y: 0, width, height: await evaluate('document.documentElement.scrollHeight'), scale: 1 } });
       writeFileSync(join(shots, `${lang}-${name}.jpg`), Buffer.from(result.data, 'base64'));
     }
+  }
+}
+
+if (shots) {
+  await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 2, mobile: true });
+  for (const lang of ['th', 'en']) {
+    await go(page(lang));
+    await settle();
+    await book(lang);
+    const { result } = await send('Page.captureScreenshot', { format: 'jpeg', quality: 80 });
+    writeFileSync(join(shots, `${lang}-booking.jpg`), Buffer.from(result.data, 'base64'));
   }
 }
 
