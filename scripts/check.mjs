@@ -97,7 +97,7 @@ for (const lang of ['th', 'en']) {
 
 await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
 if (shots) mkdirSync(shots, { recursive: true });
-for (const [name, width, height, mobile] of [['390', 390, 844, true], ['1366', 1366, 900, false]]) {
+for (const [name, width, height, mobile] of [['390', 390, 844, true], ['768', 768, 1024, true], ['1366', 1366, 900, false]]) {
   await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: mobile ? 2 : 1, mobile });
   for (const lang of ['th', 'en']) {
     await go(page(lang));
